@@ -1,3 +1,4 @@
+// библиотека шифрования
 import bcrypt from 'bcrypt';
 
 // для создания токена
@@ -5,31 +6,39 @@ import jwt from 'jsonwebtoken';
 // импорт модели пользователя
 import UserModel from '../models/User.js';
 
-
+// регистрация, получаем данные запроса
 export const register = async(req, res) => {
     try {
+    // получаем пароль
     const password = req.body.password;
+    // создаем соль для шифра
     const salt = await bcrypt.genSalt(10);
+    // переменная с зашифрованным паролем
     const hash = await bcrypt.hash(password, salt);
+    // документ с данными о пользователе
     const doc = new UserModel({
       email: req.body.email,
       fullName: req.body.fullName,
       avatarUrl: req.body.avatarUrl,
-      passwordHash: hash
+      passwordHash: hash,
     });
-  
+
+    // создаем пользователя из сохраненного документа
     const user = await doc.save();
+    
+    // создаем токен, шифруем данные
     const token = jwt.sign(
       {
       _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
       }, 
        'secret123',
-    {
-      expiresIn: '30d',
-    },
     );
+
     const { passwordHash, ...userData} = user._doc;
     res.json({...userData, token});
+    console.log(token);
   }
     catch (err){
       console.log(err);
@@ -37,6 +46,8 @@ export const register = async(req, res) => {
           message: 'Не удалось зарегистрироваться',
       })  }
   };
+
+  
 export const login = async(req, res) => {
     try {
     const user = await UserModel.findOne({email: req.body.email});

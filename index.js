@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
 
-import {loginValidator, postCreateValidator, registerValidator} from './validations.js';
+import {loginValidator, postCreateValidator, registerValidator} from './utils/validations.js';
 import {checkAuth, handleValidationsErrors} from './utils/index.js';
 import {UserController, PostController} from './controllers/index.js';
 
@@ -36,11 +36,13 @@ app.get('/', (req, res) => {
     res.send('Добро пожаловать! Приложение написано Осиповым Ильей, телеграм @osipov_mr.');
 })
 
+// регистрация пользователя
+app.post('/register', registerValidator, handleValidationsErrors, UserController.register);
+
 // авторизация пользователя
 app.post('/login', loginValidator, handleValidationsErrors, UserController.login);
 
-// регистрация пользователя
-app.post('/register', registerValidator, handleValidationsErrors, UserController.register);
+
 
 app.get('/auth/me', checkAuth, UserController.getMe);
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
