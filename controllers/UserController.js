@@ -15,7 +15,7 @@ export const register = async(req, res) => {
     const salt = await bcrypt.genSalt(10);
     // переменная с зашифрованным паролем
     const hash = await bcrypt.hash(password, salt);
-    // документ с данными о пользователе
+    // документ с данными о пользователе в БД
     const doc = new UserModel({
       email: req.body.email,
       fullName: req.body.fullName,
@@ -26,7 +26,7 @@ export const register = async(req, res) => {
     // создаем пользователя из сохраненного документа
     const user = await doc.save();
     
-    // создаем токен, шифруем данные
+    // создаем токен, шифруем данные, срок действия токена не указываем
     const token = jwt.sign(
       {
       _id: user._id,
@@ -37,6 +37,8 @@ export const register = async(req, res) => {
     );
 
     const { passwordHash, ...userData} = user._doc;
+
+    // ответ зарегистрированному пользователю
     res.json({...userData, token});
     console.log(token);
   }
@@ -47,15 +49,17 @@ export const register = async(req, res) => {
       })  }
   };
 
-  
+// авторизация пользователя
 export const login = async(req, res) => {
     try {
+    // ищем пользователя по почте
     const user = await UserModel.findOne({email: req.body.email});
     if (!user) {
     return res.status(404).json({
         message: 'Пользователь не найден',
     });
     }
+    // булеан проверки введенного пароля и существующего
     const isValidPassword = await bcrypt.compare(req.body.password, user._doc.passwordHash);
     if (!isValidPassword) {
         return res.status(400).json({
@@ -67,12 +71,11 @@ export const login = async(req, res) => {
         // помещаем шифруемую информацию
         {
         _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
         }, 
           // указываем код шифрования
          'secret123',
-      {
-        expiresIn: '90d',
-      },
       );
       const { passwordHash, ...userData} = user._doc;
       // ответ авторизованному пользователю
@@ -87,19 +90,18 @@ export const login = async(req, res) => {
         }) 
     }};
 
-
+// проверка авторизации
 export const getMe = async(req, res) => {
     try {
+        // через расшифрованный токен находим пользоваетля из БД
         const user = await UserModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
                 message: 'Пользователь не найден',
             });
         }
-
-const { passwordHash, ...userData} = user._doc;
-  res.json(userData);
-
+    const { passwordHash, ...userData} = user._doc;
+    res.json(userData);
     } catch(err) {
         console.log(err);
         res.status(500).json({
