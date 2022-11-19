@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 export default (req, res, next) => {
-    //удаление Beaere из токена, если токен получен
+    //удаление Beaer из токена, если токен получен
     const token = (req.headers.authorization || '').replace(/Bearer\s?/,'');
     if (token) {
         try {

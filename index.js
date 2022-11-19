@@ -1,5 +1,7 @@
 import express from 'express';
+// библиотека для загрузки файлов
 import multer from 'multer';
+// БД
 import mongoose from 'mongoose';
 
 import {loginValidator, postCreateValidator, registerValidator} from './utils/validations.js';
@@ -13,23 +15,23 @@ const app = express();
 app.use(express.json());
 // подключаем БД, проверяем подключение
 mongoose.connect('mongodb+srv://osipovmr:qqqqqq@cluster0.yzvyi9w.mongodb.net/?retryWrites=true&w=majority')
-.then(()=> console.log('DB ok'))
-.catch((err) => console.log('DB error', err));
+        .then(()=> console.log('DB ok'))
+        .catch((err) => console.log('DB error', err));
 
+// создаем хранилище файлов
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
+        // место хранения файлов
         cb(null, 'uploads');
     },
     filename: (_, file, cb) => {
+        // имя файла
         cb(null, file.originalname);
     },
 });
 
-const upload = multer( {storage});
-
-
-
-app.use('/uploads', express.static('uploads'));
+// константа для загрузки
+const upload = multer( {storage} );
 
 // стартовая страница приветствия
 app.get('/', (req, res) => {
@@ -42,21 +44,30 @@ app.post('/register', registerValidator, handleValidationsErrors, UserController
 // авторизация пользователя
 app.post('/login', loginValidator, handleValidationsErrors, UserController.login);
 
+// получение информации о себе
+app.get('/me', checkAuth, UserController.getMe);
 
 
-app.get('/auth/me', checkAuth, UserController.getMe);
+// создание статьи
+app.post('/posts', checkAuth, postCreateValidator, handleValidationsErrors, PostController.create);
+// получение одной статьи
+app.get('/posts/:id', PostController.getOne);
+// получение всех статей
+app.get('/posts', PostController.getAll);
+// редактирование статьи
+app.patch('/posts/:id', checkAuth, postCreateValidator, handleValidationsErrors, PostController.update);
+// удаление статьи
+app.delete('/posts/:id', checkAuth, PostController.remove);
+
+// загрузка файлов
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     res.json({
         url: `/uploads/${req.file.originalname}`,
     });
 });
 
-app.get('/posts', PostController.getAll);
-app.get('/posts/:id', PostController.getOne);
-app.post('/posts', checkAuth, postCreateValidator, handleValidationsErrors, PostController.create);
-app.delete('/posts/:id', checkAuth, PostController.remove);
-app.patch('/posts/:id', checkAuth, postCreateValidator, handleValidationsErrors, PostController.update);
-
+// объясняем приложению, где искать запрошенные файлы
+app.use('/uploads', express.static('uploads'));
 
 // прописываем порт приложения
 app.listen(4444, (err) => {
