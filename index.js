@@ -3,6 +3,7 @@ import express from 'express';
 import multer from 'multer';
 // БД
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 import {loginValidator, postCreateValidator, registerValidator} from './utils/validations.js';
 import {checkAuth, handleValidationsErrors} from './utils/index.js';
@@ -13,6 +14,7 @@ import {UserController, PostController} from './controllers/index.js';
 const app = express();
 // учим приложение понимать формат JSON входящих запросов
 app.use(express.json());
+app.use(cors());
 // подключаем БД, проверяем подключение
 mongoose.connect('mongodb+srv://osipovmr:qqqqqq@cluster0.yzvyi9w.mongodb.net/?retryWrites=true&w=majority')
         .then(()=> console.log('DB ok'))
