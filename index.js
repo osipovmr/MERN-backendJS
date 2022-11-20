@@ -3,6 +3,7 @@ import express from 'express';
 import multer from 'multer';
 // БД
 import mongoose from 'mongoose';
+// разрешение на доступ из фронта
 import cors from 'cors';
 
 import {loginValidator, postCreateValidator, registerValidator} from './utils/validations.js';
