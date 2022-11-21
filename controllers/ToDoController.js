@@ -1,25 +1,24 @@
-import PostModel from '../models/Post.js';
+import ToDoModel from '../models/ToDo.js';
 
-// создание статьи
+// создание записи
 export const create = async(req, res) => {
     try {
-        // создаем документ статьи, данные берем из запроса
-        const doc = new PostModel({
+        // создаем документ записи, данные берем из запроса
+        const doc = new ToDoModel({
             title: req.body.title,
             text: req.body.text,
             imageUrl: req.body.imageUrl,
-            tags: req.body.tags,
             user: req.userId,
         });
         // сохраняем данные
-        const post = await doc.save();
-        // в ответ выдаем данные статьи
-        res.json(post);
+        const toDo = await doc.save();
+        // в ответ выдаем данные записи
+        res.json(toDo);
     }
     catch (err) {
         console.log(err);
         res.status(500).json({
-        message: 'Не удалось создать статью',
+        message: 'Не удалось создать запись',
         })  
     }
 }
@@ -27,46 +26,38 @@ export const create = async(req, res) => {
 // получение всех статей
 export const getAll = async(req, res) => {
     try {
-        // поиск статей с указанием автора
-        const posts = await PostModel.find().populate('user').exec();
-        res.json(posts);
+        // поиск записей с указанием автора
+        const toDo = await ToDoModel.find().populate('user').exec();
+        res.json(toDo);
     }
     catch (err) {
         console.log(err);
         res.status(500).json({
-            message: 'Не удалось получить статьи.',
+            message: 'Не удалось получить записи.',
             })  
     }
 }
 
-// получение одной статьи
+// получение одной записи
 export const getOne = async(req, res) => {
     try {
-        // получаем id статьи из запроса
-        const postId = req.params.id;
-        // поиск статьи
-        PostModel.findOneAndUpdate(
+        // получаем id записи из запроса
+        const toDoId = req.params.id;
+        // поиск записи
+        ToDoModel.findOne(
             {
-                _id: postId,
-            },
-            {
-                // увеличение количества просмотров на 1
-                $inc: {viewsCount: 1},
-            },
-            {
-                // вернуть документ после обновления
-                returnDocument: 'after',
+                _id: toDoId,
             },
                 (err, doc) => {
                     if (err) {
                         console.log(err);
                         return res.status(500).json({
-                            message: 'Не удалось получить статью.',
+                            message: 'Не удалось получить запись.',
                             });
                     }
                     if (!doc) {
                         res.status(404).json({
-                        message: 'Статья не найдена.',
+                        message: 'Запись не найдена.',
                         });
                     }
                     res.json(doc);
@@ -76,29 +67,29 @@ export const getOne = async(req, res) => {
     catch (err) {
         console.log(err);
         res.status(500).json({
-            message: 'Не удалось получить статью.',
+            message: 'Не удалось получить запись.',
             })
     }
 }
 
-// удаление статьи
+// удаление записи
 export const remove = async(req, res) => {
     try {
-        const postId = req.params.id;
+        const toDoId = req.params.id;
         PostModel.findOneAndDelete(
             {
-                _id: postId,
+                _id: toDoId,
             },
                 (err, doc) => {
                     if (err) {
                         console.log(err);
                         return res.status(500).json({
-                            message: 'Не удалось удалить статью.',
+                            message: 'Не удалось удалить запись.',
                             });
                     }
                     if (!doc) {
                         res.status(404).json({
-                        message: 'Статья не найдена.',
+                        message: 'Запись не найдена.',
                         });
                     }
                     res.json({
@@ -110,24 +101,23 @@ export const remove = async(req, res) => {
     catch (err) {
         console.log(err);
         res.status(500).json({
-            message: 'Не удалось получить статьи.',
+            message: 'Не удалось получить запись.',
             })
     }
 }
 
-// редактирование статьи
+// редактирование записи
 export const update = async(req, res) => {
     try {
-        const postId = req.params.id;
-        await PostModel.findByIdAndUpdate(
+        const toDoId = req.params.id;
+        await ToDoModel.findByIdAndUpdate(
             {
-                _id: postId,
+                _id: toDoId,
             },
             {
                 title: req.body.title,
                 text: req.body.text,
                 imageUrl: req.body.imageUrl,
-                tags: req.body.tags,
                 user: req.userId,
             },
         );
@@ -138,7 +128,7 @@ export const update = async(req, res) => {
     catch (err) {
         console.log(err);
         res.status(500).json({
-            message: 'Не удалось обновить статью',
+            message: 'Не удалось обновить запись',
         });  
     }
 }

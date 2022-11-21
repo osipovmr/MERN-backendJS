@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
 // разрешение на доступ из фронта
 import cors from 'cors';
 
-import {loginValidator, postCreateValidator, registerValidator} from './utils/validations.js';
+import {loginValidator, toDoCreateValidator, registerValidator} from './utils/validations.js';
 import {checkAuth, handleValidationsErrors} from './utils/index.js';
-import {UserController, PostController} from './controllers/index.js';
+import {UserController, ToDoController} from './controllers/index.js';
 
 
 // подключаем экспресс
@@ -52,15 +52,15 @@ app.get('/me', checkAuth, UserController.getMe);
 
 
 // создание статьи
-app.post('/posts', checkAuth, postCreateValidator, handleValidationsErrors, PostController.create);
+app.post('/todo', checkAuth, toDoCreateValidator, handleValidationsErrors, ToDoController.create);
 // получение одной статьи
-app.get('/posts/:id', PostController.getOne);
+app.get('/todo/:id', ToDoController.getOne);
 // получение всех статей
-app.get('/posts', PostController.getAll);
+app.get('/todo', ToDoController.getAll);
 // редактирование статьи
-app.patch('/posts/:id', checkAuth, postCreateValidator, handleValidationsErrors, PostController.update);
+app.patch('/todo/:id', checkAuth, toDoCreateValidator, handleValidationsErrors, ToDoController.update);
 // удаление статьи
-app.delete('/posts/:id', checkAuth, PostController.remove);
+app.delete('/todo/:id', checkAuth, ToDoController.remove);
 
 // загрузка файлов
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {

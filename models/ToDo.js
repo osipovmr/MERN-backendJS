@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 // создаем модель статьи
-const PostSchema = new mongoose.Schema(
+const ToDoSchema = new mongoose.Schema(
     {
         title: {
             type: String,
@@ -12,14 +12,7 @@ const PostSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        tags: {
-            type: Array,
-            default: [],
-        },
-        viewsCount: {
-            type: Number,
-            default: 0,
-        },
+        
         // автор статьи
         user: {
             type: mongoose.Schema.Types.ObjectId,
@@ -31,8 +24,7 @@ const PostSchema = new mongoose.Schema(
     {
         timestamps: true,
     }
-
 );
 
 // отправляем в БД
-export default mongoose.model('Post', PostSchema);
+export default mongoose.model('ToDo', ToDoSchema);

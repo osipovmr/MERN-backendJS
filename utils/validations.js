@@ -14,10 +14,9 @@ export const registerValidator = [
     body('avatarUrl', 'Не верная ссылка на аватарку').optional().isURL(),
 ]
 
-// проверка данных при создании статьи
-export const postCreateValidator = [
-    body('title', 'введите заголовок статьию').isLength({min: 3}).isString(),
-    body('text', 'Введите текст статьию').isLength({min: 10}).isString(),
-    body('tags', 'Неверный формат тэгов (укажите массив).').optional().isString(),
+// проверка данных при создании записи
+export const toDoCreateValidator = [
+    body('title', 'Введите заголовок записи').isLength({min: 3}).isString(),
+    body('text', 'Введите текст записи').isLength({min: 10}).isString(),
     body('imageUrl', 'Не верная ссылка на изображение').optional().isString(),
 ]
