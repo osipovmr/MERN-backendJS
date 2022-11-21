@@ -23,7 +23,7 @@ const PostSchema = new mongoose.Schema(
         // автор статьи
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            reg: 'user',
+            ref: 'user',
             required: true,
         },
         imageUrl: String,
